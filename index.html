@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#07110f" />
+    <meta name="description" content="喝了吗？和世界各地的朋友轻轻赛博干杯。" data-i18n-content="meta.description" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="喝了吗" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>喝了吗 — Cheers With Me</title>
+  </head>
+  <body>
+    <svg class="icon-sprite" aria-hidden="true">
+      <defs>
+        <linearGradient id="glass-shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".7"/><stop offset=".27" stop-color="#dff8f4" stop-opacity=".14"/><stop offset=".68" stop-color="#9bc5c1" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity=".5"/></linearGradient>
+        <linearGradient id="wine-liquid" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#d45a67"/><stop offset=".48" stop-color="#8b1638"/><stop offset="1" stop-color="#3f0925"/></linearGradient>
+        <linearGradient id="beer-liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd966"/><stop offset=".55" stop-color="#e99922"/><stop offset="1" stop-color="#a7540d"/></linearGradient>
+        <linearGradient id="cocktail-liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb660"/><stop offset=".58" stop-color="#e64e63"/><stop offset="1" stop-color="#9d254e"/></linearGradient>
+        <linearGradient id="champagne-liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3a6"/><stop offset=".55" stop-color="#eec65c"/><stop offset="1" stop-color="#c98b28"/></linearGradient>
+        <linearGradient id="ceramic-shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffdf4"/><stop offset=".45" stop-color="#d9e1dc"/><stop offset="1" stop-color="#81918a"/></linearGradient>
+        <linearGradient id="tea-liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9c45c"/><stop offset=".55" stop-color="#b77b25"/><stop offset="1" stop-color="#694515"/></linearGradient>
+        <linearGradient id="zero-liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b6f4ed"/><stop offset=".52" stop-color="#4ac4c8"/><stop offset="1" stop-color="#257699"/></linearGradient>
+        <radialGradient id="coffee-liquid" cx="42%" cy="35%" r="70%"><stop stop-color="#a96f42"/><stop offset=".5" stop-color="#5b2e1d"/><stop offset="1" stop-color="#24100d"/></radialGradient>
+      </defs>
+      <symbol id="drink-wine" viewBox="0 0 32 32">
+        <path d="M7.1 4.4h17.8c-.2 8.1-3.1 13.1-8.9 14.5-5.8-1.4-8.7-6.4-8.9-14.5Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".76" stroke-width="1.05"/>
+        <path d="M8.7 10.5h14.6c-.8 4.1-3 6.6-7.3 7.6-4.3-1-6.5-3.5-7.3-7.6Z" fill="url(#wine-liquid)" stroke="#f79099" stroke-opacity=".45" stroke-width=".45"/>
+        <ellipse cx="16" cy="4.45" rx="8.9" ry="1.15" fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".88" stroke-width=".8"/>
+        <path d="M16 18.9v7.25M11.5 27.35h9" fill="none" stroke="#f2ffff" stroke-opacity=".82" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M10 6.7c.25 3.5 1.1 6.3 3 8.1" fill="none" stroke="#fff" stroke-opacity=".62" stroke-width=".8" stroke-linecap="round"/>
+        <ellipse cx="16" cy="27.35" rx="4.8" ry=".75" fill="#fff" fill-opacity=".12"/>
+      </symbol>
+      <symbol id="drink-beer" viewBox="0 0 32 32">
+        <path d="M6 7.5h16.7v18.8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V7.5Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".78" stroke-width="1.05"/>
+        <path d="M7.4 11.4h13.9v14.5c0 .65-.5 1.1-1.1 1.1H8.5c-.6 0-1.1-.45-1.1-1.1V11.4Z" fill="url(#beer-liquid)"/>
+        <path d="M7.2 11.8c1.1-3 3.1-.7 4.5-2.2 1.5-1.7 3.1 1 4.8-.6 1.5-1.4 3.1.2 4.8 1v4.1H7.2v-2.3Z" fill="#fff5d2" stroke="#fff" stroke-opacity=".6" stroke-width=".35"/>
+        <path d="M22.8 11.6h2c2.1 0 3.6 1.45 3.6 3.55v6.15c0 2.1-1.5 3.55-3.6 3.55h-2.1v-3h1.75c.7 0 1.05-.45 1.05-1.15v-4.95c0-.7-.35-1.15-1.05-1.15h-1.65" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".72" stroke-width="1"/>
+        <path d="M9.4 15.3v8.7M12.4 15.3v8.7" fill="none" stroke="#fff" stroke-opacity=".33" stroke-width=".75" stroke-linecap="round"/>
+        <circle cx="17.3" cy="17.2" r=".65" fill="#fff6c4" fill-opacity=".82"/><circle cx="18.4" cy="21.1" r=".45" fill="#fff6c4" fill-opacity=".72"/>
+      </symbol>
+      <symbol id="drink-cocktail" viewBox="0 0 32 32">
+        <path d="M3.8 5.2h24.4L16 18 3.8 5.2Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".78" stroke-width="1.05"/>
+        <path d="M7.2 8.5h17.6L16 17.1 7.2 8.5Z" fill="url(#cocktail-liquid)"/>
+        <path d="M16 18v8.35M10.7 27.4h10.6" fill="none" stroke="#f2ffff" stroke-opacity=".82" stroke-width="1.15" stroke-linecap="round"/>
+        <path d="M20.4 10.3 25.8 2.2" fill="none" stroke="#f0dfb6" stroke-width=".9" stroke-linecap="round"/>
+        <circle cx="23.2" cy="7" r="2.45" fill="#d33451" stroke="#ff9a9c" stroke-width=".5"/><path d="M22.1 5.3c.5-.9 1.25-1.25 2.1-1.3" fill="none" stroke="#6f9d55" stroke-width=".65" stroke-linecap="round"/>
+        <path d="M7.5 6.3h16" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".6"/>
+      </symbol>
+      <symbol id="drink-champagne" viewBox="0 0 32 32">
+        <path d="M9 3.7h14c-.15 8.5-2.3 13.3-7 14.7-4.7-1.4-6.85-6.2-7-14.7Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".8" stroke-width="1"/>
+        <path d="M10.5 8.8h11c-.55 4.8-2.25 7.7-5.5 8.7-3.25-1-4.95-3.9-5.5-8.7Z" fill="url(#champagne-liquid)"/>
+        <ellipse cx="16" cy="3.75" rx="7" ry=".95" fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".88" stroke-width=".75"/>
+        <path d="M16 18.4v7.8M11.2 27.3h9.6" fill="none" stroke="#f2ffff" stroke-opacity=".84" stroke-width="1.15" stroke-linecap="round"/>
+        <circle cx="14.1" cy="14.3" r=".55" fill="#fff7c7"/><circle cx="17.7" cy="12.1" r=".42" fill="#fff7c7"/><circle cx="15.7" cy="10.4" r=".32" fill="#fff7c7"/>
+        <path d="M11.6 5.7c.2 3.5.8 6 2.1 8" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".65" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="drink-sake" viewBox="0 0 32 32">
+        <path d="M9.7 7.2h8.7l2.1 4.6v14.3H6.9V11.8l2.8-4.6Z" fill="url(#ceramic-shell)" stroke="#fff" stroke-opacity=".72" stroke-width=".9"/>
+        <path d="M10.5 3.2h7.2v4h-7.2Z" fill="url(#ceramic-shell)" stroke="#fff" stroke-opacity=".72" stroke-width=".8"/>
+        <path d="M8 13.2h11.4M9.1 23.8c2.7 1.1 6.9 1.1 10.2 0" fill="none" stroke="#52766f" stroke-opacity=".75" stroke-width=".75"/>
+        <circle cx="13.7" cy="18.5" r="2.35" fill="#345e57" fill-opacity=".84"/><path d="M12.5 18.7c.7-.7 1.5-.9 2.4-.45" fill="none" stroke="#d9b86b" stroke-width=".55"/>
+        <path d="M22 19.2h6.4v7.2c-1.35 1.25-5.05 1.25-6.4 0v-7.2Z" fill="url(#ceramic-shell)" stroke="#fff" stroke-opacity=".72" stroke-width=".8"/><ellipse cx="25.2" cy="19.2" rx="3.2" ry=".72" fill="#dce6df" stroke="#fff" stroke-opacity=".7" stroke-width=".45"/>
+        <path d="M8.5 10.6c2.1 1 7.3 1 10.2 0" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".6"/>
+      </symbol>
+      <symbol id="drink-coffee" viewBox="0 0 32 32">
+        <path d="M5.4 10.2h18.2v10.1c0 4.5-3.4 7.35-9.1 7.35s-9.1-2.85-9.1-7.35V10.2Z" fill="url(#ceramic-shell)" stroke="#fff" stroke-opacity=".76" stroke-width=".9"/>
+        <ellipse cx="14.5" cy="10.25" rx="9.1" ry="2.25" fill="url(#coffee-liquid)" stroke="#fff" stroke-opacity=".5" stroke-width=".55"/>
+        <path d="M23.6 13.1h2c4.15 0 4.15 7.3 0 7.3h-2.25v-2.25h1.9c1.6 0 1.6-2.8 0-2.8h-1.65" fill="url(#ceramic-shell)" stroke="#fff" stroke-opacity=".7" stroke-width=".8"/>
+        <ellipse cx="14.5" cy="28.3" rx="11.2" ry="1.35" fill="#d7ded7" fill-opacity=".72" stroke="#fff" stroke-opacity=".5" stroke-width=".55"/>
+        <path d="M10.1 7.1c-1.5-1.7 1.8-2.5.2-4.6M16.1 7c-1.5-1.8 1.8-2.7.3-4.8" fill="none" stroke="#fff" stroke-opacity=".72" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M8.1 14v6.2c0 2.5 1.35 4 3.5 4.6" fill="none" stroke="#fff" stroke-opacity=".56" stroke-width=".7" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="drink-tea" viewBox="0 0 32 32">
+        <path d="M5 10.4h19v10.1c0 4.35-3.55 7.1-9.5 7.1S5 24.85 5 20.5V10.4Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".8" stroke-width="1"/>
+        <path d="M6.5 13h16v7.3c0 3.4-2.85 5.7-8 5.7s-8-2.3-8-5.7V13Z" fill="url(#tea-liquid)" fill-opacity=".9"/>
+        <ellipse cx="14.5" cy="12.95" rx="8" ry="1.35" fill="#e7c466" fill-opacity=".84" stroke="#fff5c3" stroke-opacity=".5" stroke-width=".4"/>
+        <path d="M24 13.3h2c4.05 0 4.05 7 0 7h-2.25v-2.15h1.9c1.55 0 1.55-2.7 0-2.7H24" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".74" stroke-width=".85"/>
+        <path d="M3.5 28.4h23.2" fill="none" stroke="#efffff" stroke-opacity=".58" stroke-width=".8" stroke-linecap="round"/>
+        <path d="M13 8.3c1.15-3.7 3.85-5.3 7.6-5.4-.8 3.6-3.1 5.8-7.6 5.4Z" fill="#79ad67" stroke="#c9e6a1" stroke-width=".5"/><path d="M13.2 8.2 18.7 4" fill="none" stroke="#e8f5cf" stroke-opacity=".7" stroke-width=".45"/>
+      </symbol>
+      <symbol id="drink-zero" viewBox="0 0 32 32">
+        <path d="M6.5 7.3h19l-2.1 20.4H8.6L6.5 7.3Z" fill="url(#glass-shell)" stroke="#efffff" stroke-opacity=".8" stroke-width="1"/>
+        <path d="M8.1 12.2h15.8l-1.55 14H9.55l-1.45-14Z" fill="url(#zero-liquid)" fill-opacity=".88"/>
+        <path d="m10.1 14.3 4.4-.8 1.2 4.5-4.6.8-1-4.5Zm6.8 5.5 4.1-.55.8 4.2-4.25.45-.65-4.1Z" fill="#eaffff" fill-opacity=".58" stroke="#fff" stroke-opacity=".5" stroke-width=".4"/>
+        <circle cx="13.2" cy="22.5" r=".6" fill="#fff"/><circle cx="19.8" cy="15.8" r=".5" fill="#fff"/><circle cx="18" cy="24.8" r=".36" fill="#fff"/>
+        <path d="M19.2 7.2c1.1-2.7 3-4.2 5.6-4.6 1 2.9-.4 5.1-3.7 6.2" fill="#9ddc68" stroke="#efffc8" stroke-width=".55"/><path d="m18.8 4.2 5.8 5.2" fill="none" stroke="#edf5de" stroke-width=".65" stroke-linecap="round"/>
+        <path d="M9.1 9.4h13.8" fill="none" stroke="#fff" stroke-opacity=".62" stroke-width=".65"/>
+      </symbol>
+    </svg>
+    <div class="app-shell" id="app">
+      <div id="map" aria-label="好友举杯地图" data-i18n-aria="aria.map"></div>
+      <div class="map-vignette" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <button class="top-icon avatar-button" type="button" data-open-sheet="profileSheet" aria-label="我的设置" data-i18n-aria="aria.profile">
+          <img src="assets/ai-avatar-bonnie-v1.webp" alt="我的 AI 酒友分身" data-i18n-alt="alt.myAvatar" />
+        </button>
+        <button class="app-title" type="button" data-open-sheet="aboutSheet" aria-label="关于喝了吗" data-i18n-aria="aria.about">
+          <strong>CHEERS WITH ME</strong>
+          <small data-i18n="brand.tagline">喝了吗 · 赛博干杯</small>
+        </button>
+        <button class="top-icon friends-button" type="button" data-open-sheet="friendsSheet" aria-label="好友" data-i18n-aria="aria.friends">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </button>
+      </header>
+
+      <section class="quick-action" aria-label="举杯签到" data-i18n-aria="aria.checkin">
+        <button class="cheers-button" id="cheersButton" type="button" data-open-sheet="checkinSheet" aria-label="举杯签到" data-i18n-aria="aria.checkin">
+          <span class="cheers-halo"></span>
+          <small class="quick-prompt" id="quickPrompt" data-i18n="quick.prompt">现在喝什么？</small>
+          <svg class="drink-svg cheers-cup" aria-hidden="true"><use href="#drink-wine"></use></svg>
+          <strong class="cheers-label" data-i18n="quick.raise">举杯</strong>
+        </button>
+        <button class="live-pill glass-panel" id="livePill" type="button" data-open-sheet="checkinSheet" hidden>
+          <span class="live-dot"></span>
+          <span id="liveTime" data-i18n="quick.live">正在举杯</span>
+        </button>
+      </section>
+
+      <div class="map-tools">
+        <button class="map-tool glass-panel" id="languageButton" type="button" data-open-sheet="languageSheet" aria-label="切换语言" data-i18n-aria="aria.language">
+          <span class="language-badge" id="languageBadge" aria-hidden="true">中</span>
+        </button>
+        <button class="map-tool glass-panel theme-button" id="themeButton" type="button" aria-label="切换昼夜主题" data-i18n-aria="aria.theme">
+          <span id="themeSymbol" aria-hidden="true">☾</span>
+        </button>
+        <button class="map-tool glass-panel" id="worldButton" type="button" aria-label="查看世界地图" data-i18n-aria="aria.world">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3 3 4 6 4 9s-1 6-4 9c-3-3-4-6-4-9s1-6 4-9Z"></path></svg>
+        </button>
+        <button class="map-tool glass-panel" id="locateButton" type="button" aria-label="回到我的位置" data-i18n-aria="aria.locate">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path><circle cx="12" cy="12" r="7"></circle></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+
+    <section class="bottom-sheet" id="checkinSheet" aria-labelledby="checkinTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div>
+          <p class="eyebrow" data-i18n="checkin.eyebrow">A small hello</p>
+          <h2 id="checkinTitle" data-i18n="checkin.title">此刻，喝什么？</h2>
+        </div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+
+      <div class="drink-picker" id="drinkPicker" role="radiogroup" aria-label="选择酒杯" data-i18n-aria="aria.drinkPicker">
+        <button class="drink-option selected" type="button" data-drink="wine" data-emoji="🍷" role="radio" aria-checked="true"><svg class="drink-svg"><use href="#drink-wine"></use></svg><small data-i18n="drink.wine">红酒</small></button>
+        <button class="drink-option" type="button" data-drink="beer" data-emoji="🍺" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-beer"></use></svg><small data-i18n="drink.beer">啤酒</small></button>
+        <button class="drink-option" type="button" data-drink="cocktail" data-emoji="🍸" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-cocktail"></use></svg><small data-i18n="drink.cocktail">鸡尾酒</small></button>
+        <button class="drink-option" type="button" data-drink="champagne" data-emoji="🥂" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-champagne"></use></svg><small data-i18n="drink.champagne">香槟</small></button>
+        <button class="drink-option" type="button" data-drink="sake" data-emoji="🍶" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-sake"></use></svg><small data-i18n="drink.sake">清酒</small></button>
+        <button class="drink-option" type="button" data-drink="coffee" data-emoji="☕" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-coffee"></use></svg><small data-i18n="drink.coffee">咖啡</small></button>
+        <button class="drink-option" type="button" data-drink="tea" data-emoji="🍵" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-tea"></use></svg><small data-i18n="drink.tea">茶</small></button>
+        <button class="drink-option" type="button" data-drink="zero" data-emoji="🫧" role="radio" aria-checked="false"><svg class="drink-svg"><use href="#drink-zero"></use></svg><small data-i18n="drink.zero">无酒精</small></button>
+      </div>
+
+      <div class="location-card" id="locationCard">
+        <span class="location-pin">⌖</span>
+        <div>
+          <small data-i18n="checkin.locationOnce">你的这一次位置</small>
+          <strong id="locationLabel" data-i18n="checkin.locationTap">点击后读取，不会持续追踪</strong>
+        </div>
+        <span class="privacy-badge" data-i18n="common.friendsOnly">仅好友</span>
+      </div>
+
+      <div class="setting-block">
+        <div class="setting-heading">
+          <span data-i18n="checkin.visibility">显示范围</span>
+          <small data-i18n="checkin.visibilityNote">你决定朋友能看到多少</small>
+        </div>
+        <div class="segmented" id="precisionPicker">
+          <button class="selected" type="button" data-precision="city" data-i18n="checkin.cityOnly">只显示城市</button>
+          <button type="button" data-precision="place" data-i18n="checkin.exactPlace">显示具体地点</button>
+        </div>
+      </div>
+
+      <div class="setting-block">
+        <div class="setting-heading">
+          <span data-i18n="checkin.disappear">自动消失</span>
+          <small data-i18n="checkin.disappearNote">不留下行动轨迹</small>
+        </div>
+        <div class="segmented three" id="durationPicker">
+          <button type="button" data-hours="2" data-i18n="time.2h">2小时</button>
+          <button class="selected" type="button" data-hours="4" data-i18n="time.4h">4小时</button>
+          <button type="button" data-hours="6" data-i18n="time.6h">6小时</button>
+        </div>
+      </div>
+
+      <button class="primary-button" id="publishCheckin" type="button">
+        <span class="button-cup"><svg class="drink-svg"><use href="#drink-wine"></use></svg></span>
+        <span><strong data-i18n="checkin.publish">在这里举杯</strong><small data-i18n="checkin.publishNote">只有好友能看到</small></span>
+      </button>
+      <button class="ghost-danger" id="endCheckin" type="button" hidden data-i18n="checkin.end">结束本次举杯</button>
+    </section>
+
+    <section class="bottom-sheet compact-sheet" id="friendSheet" aria-labelledby="friendName" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <button class="close-button floating-close" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      <div class="friend-hero">
+        <div class="friend-avatar" id="friendAvatar">A</div>
+        <div class="friend-cup-large" id="friendCup"><svg class="drink-svg"><use href="#drink-beer"></use></svg></div>
+        <p class="eyebrow" data-i18n="friend.eyebrow">A friend, somewhere</p>
+        <h2 id="friendName">Alex</h2>
+        <p class="friend-place" id="friendPlace">Stockholm · Södermalm</p>
+        <p class="friend-time" id="friendTime">18分钟前</p>
+      </div>
+      <button class="primary-button clink-button" id="clinkButton" type="button">
+        <span class="button-cup"><svg class="drink-svg"><use href="#drink-champagne"></use></svg></span>
+        <span><strong data-i18n="friend.clink">和 TA 赛博干杯</strong><small data-i18n="friend.clinkNote">不需要说什么</small></span>
+      </button>
+    </section>
+
+    <section class="bottom-sheet tall-sheet" id="friendsSheet" aria-labelledby="friendsTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow" data-i18n="friends.eyebrow">Your little circle</p><h2 id="friendsTitle" data-i18n="friends.title">好友</h2></div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+      <button class="invite-card" id="inviteButton" type="button">
+        <span class="invite-icon">＋</span>
+        <span><strong data-i18n="friends.invite">邀请一个朋友</strong><small data-i18n="friends.inviteNote">复制私人邀请链接</small></span>
+        <span>↗</span>
+      </button>
+      <div class="friend-list" id="friendList"></div>
+      <p class="quiet-note" data-i18n="friends.privacy">这里只有你互相确认过的朋友。没有关注者，也没有陌生人。</p>
+    </section>
+
+    <section class="bottom-sheet tall-sheet" id="profileSheet" aria-labelledby="profileTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow" data-i18n="profile.eyebrow">My cyber drinking buddy</p><h2 id="profileTitle" data-i18n="profile.title">我的 Cheers</h2></div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar ai-avatar"><img src="assets/ai-avatar-bonnie-v1.webp" alt="我的 AI 酒友分身" data-i18n-alt="alt.myAvatar" /></div>
+        <div><strong data-i18n="profile.me">我</strong><small><span class="ai-dot"></span> <span data-i18n="profile.avatarLine">AI 酒友分身 · 已就绪</span></small></div>
+        <button id="regenerateAvatar" type="button" data-i18n="profile.regenerate">换形象</button>
+      </div>
+      <div class="profile-features">
+        <button type="button" data-open-sheet="historySheet"><span>◷</span><strong data-i18n="history.title">我的酒迹</strong><small data-i18n="profile.historySummary">12 次 · 5 个城市</small><b>›</b></button>
+        <button type="button" data-open-sheet="reportSheet"><span>✦</span><strong data-i18n="profile.reportTitle">今晚酒报</strong><small data-i18n="profile.reportSummary">4 位朋友正在举杯</small><b>›</b></button>
+      </div>
+      <div class="privacy-list">
+        <label class="history-toggle"><span>⌁</span><p><strong data-i18n="profile.autoHistory">自动记录我的酒迹</strong><small data-i18n="profile.autoHistoryNote">默认关闭；只保存在私人历史</small></p><input id="historyToggle" type="checkbox" /><i aria-hidden="true"></i></label>
+        <div><span>◎</span><p><strong data-i18n="profile.noTracking">不持续定位</strong><small data-i18n="profile.noTrackingNote">只有主动举杯时读取一次位置</small></p><em data-i18n="common.on">开启</em></div>
+        <div><span>◌</span><p><strong data-i18n="profile.mutualFriends">好友双向确认</strong><small data-i18n="profile.mutualFriendsNote">只有互相同意后才能看见</small></p><em data-i18n="common.on">开启</em></div>
+        <div><span>⌛</span><p><strong data-i18n="profile.autoDisappear">自动消失</strong><small data-i18n="profile.autoDisappearNote">地图状态消失，私人酒迹由你决定</small></p><em data-i18n="common.on">开启</em></div>
+      </div>
+      <button class="secondary-button" id="installButton" type="button" data-i18n="profile.install">添加到手机桌面</button>
+      <p class="version-note" data-i18n="profile.version">喝了吗 · CHEERS WITH ME · 公开体验版 0.5</p>
+    </section>
+
+    <section class="bottom-sheet tall-sheet" id="historySheet" aria-labelledby="historyTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow" data-i18n="history.eyebrow">My private drinking trail</p><h2 id="historyTitle" data-i18n="history.title">我的酒迹</h2></div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+      <div class="history-hero">
+        <div><strong id="historyCount">12</strong><small data-i18n="history.checkins">次举杯</small></div>
+        <div><strong>5</strong><small data-i18n="history.cities">座城市</small></div>
+        <div><strong><svg class="drink-svg"><use href="#drink-wine"></use></svg></strong><small data-i18n="history.favorite">最常选择</small></div>
+      </div>
+      <div class="history-timeline" id="historyTimeline">
+        <article><span class="history-cup"><svg class="drink-svg"><use href="#drink-wine"></use></svg></span><div><strong>Stockholm · Södermalm</strong><small data-i18n="history.seed1">昨晚 22:18 · 和 Alex 赛博干杯</small></div><b>08.05</b></article>
+        <article><span class="history-cup"><svg class="drink-svg"><use href="#drink-cocktail"></use></svg></span><div><strong>Copenhagen · Vesterbro</strong><small data-i18n="history.seed2">周六 20:42 · 3 位朋友在线</small></div><b>08.01</b></article>
+        <article><span class="history-cup"><svg class="drink-svg"><use href="#drink-champagne"></use></svg></span><div><strong>Paris · Le Marais</strong><small data-i18n="history.seed3">7月24日 23:09 · 收到 5 次干杯</small></div><b>07.24</b></article>
+        <article><span class="history-cup"><svg class="drink-svg"><use href="#drink-sake"></use></svg></span><div><strong>Tokyo · Shibuya</strong><small data-i18n="history.seed4">7月10日 19:37 · 第一次清酒签到</small></div><b>07.10</b></article>
+      </div>
+      <p class="quiet-note" data-i18n="history.privacy">这是你的私人记录，不会显示给好友。关闭自动记录后，新举杯只会在地图上限时出现。</p>
+    </section>
+
+    <section class="bottom-sheet tall-sheet" id="reportSheet" aria-labelledby="reportTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow" data-i18n="report.eyebrow">AI-generated circle recap</p><h2 id="reportTitle" data-i18n="report.title">今晚酒圈日报</h2></div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+      <article class="daily-report">
+        <header><span>08 / 06</span><b data-i18n="report.weekday">THURSDAY</b><em data-i18n="report.badge">✦ AI 酒报</em></header>
+        <div class="report-orbit" aria-hidden="true">
+          <span class="orbit-avatar orbit-one">A</span><span class="orbit-cup cup-one"><svg class="drink-svg"><use href="#drink-coffee"></use></svg></span>
+          <span class="orbit-avatar orbit-two">L</span><span class="orbit-cup cup-two"><svg class="drink-svg"><use href="#drink-tea"></use></svg></span>
+          <span class="orbit-avatar orbit-three">M</span><span class="orbit-cup cup-three"><svg class="drink-svg"><use href="#drink-cocktail"></use></svg></span>
+          <span class="orbit-avatar orbit-four">K</span><span class="orbit-cup cup-four"><svg class="drink-svg"><use href="#drink-sake"></use></svg></span>
+          <strong>CHEERS<br /><small>WITH ME</small></strong>
+        </div>
+        <h3 data-i18n="report.headline">今晚，世界各有一杯。</h3>
+        <p data-i18n="report.body">Stockholm 用咖啡开场，Shanghai 泡了一盏茶，New York 的鸡尾酒和 Tokyo 的清酒随后亮起。有的微醺，有的清醒；你们没说一句话，却在同一个晚上碰了杯。</p>
+        <div class="report-stats"><span><strong>4</strong><small data-i18n="report.friends">位朋友</small></span><span><strong>4</strong><small data-i18n="report.cities">座城市</small></span><span><strong>7</strong><small data-i18n="report.clinks">次碰杯</small></span></div>
+        <footer><span data-i18n="report.hashtag">#今晚全世界都在</span><span data-i18n="report.circleOnly">仅圈内可见</span></footer>
+      </article>
+      <button class="secondary-button" id="saveReport" type="button" data-i18n="report.save">生成可分享的酒报卡片</button>
+      <p class="quiet-note" data-i18n="report.privacy">日报只汇总朋友主动分享的举杯瞬间，不展示长期轨迹，也没有点赞和评论。</p>
+    </section>
+
+    <section class="bottom-sheet compact-sheet" id="aboutSheet" aria-labelledby="aboutTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <button class="close-button floating-close" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      <div class="about-lockup"><span>S</span></div>
+      <p class="eyebrow centered" data-i18n="about.eyebrow">Cyber cheers, somewhere in the world</p>
+      <h2 class="centered" id="aboutTitle" data-i18n-html="about.title">我不想聊天，<br />只想让你知道，<br />我此刻正在世界某处举杯。</h2>
+      <p class="about-copy" data-i18n="about.copy">AI 酒友分身、全球好友酒杯和一声轻轻的碰杯。没有聊天，没有评论。</p>
+    </section>
+
+    <section class="bottom-sheet compact-sheet language-sheet" id="languageSheet" aria-labelledby="languageTitle" aria-modal="true" role="dialog" hidden>
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div><p class="eyebrow" data-i18n="language.eyebrow">Your language</p><h2 id="languageTitle" data-i18n="language.title">选择语言</h2></div>
+        <button class="close-button" type="button" data-close-sheet aria-label="关闭" data-i18n-aria="aria.close">×</button>
+      </div>
+      <div class="language-options" id="languageOptions" role="radiogroup" aria-label="选择语言" data-i18n-aria="aria.languagePicker">
+        <button type="button" data-language="auto" role="radio" aria-checked="false"><span>◎</span><strong data-i18n="language.auto">跟随手机语言</strong><small id="detectedLanguage">简体中文</small></button>
+        <button type="button" data-language="zh-CN" role="radio" aria-checked="false"><span>中</span><strong>简体中文</strong><small>Chinese</small></button>
+        <button type="button" data-language="en" role="radio" aria-checked="false"><span>EN</span><strong>English</strong><small>English</small></button>
+        <button type="button" data-language="sv" role="radio" aria-checked="false"><span>SV</span><strong>Svenska</strong><small>Swedish</small></button>
+      </div>
+      <p class="quiet-note" data-i18n="language.note">地图地点名称会尽量使用所选语言；可以随时切换。</p>
+    </section>
+
+    <div class="clink-scene" id="clinkScene" hidden aria-live="polite">
+      <div class="clink-glow"></div>
+      <svg class="drink-svg clink-left" aria-hidden="true"><use href="#drink-champagne"></use></svg><svg class="drink-svg clink-right" aria-hidden="true"><use href="#drink-champagne"></use></svg>
+      <strong>CHEERS!</strong>
+      <small id="clinkText" data-i18n="clink.default">你们在世界两端碰了一杯</small>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <section class="onboarding" id="onboarding" aria-labelledby="welcomeTitle">
+      <div class="onboarding-map" aria-hidden="true"></div>
+      <div class="onboarding-content">
+        <div class="onboarding-avatar"><img src="assets/ai-avatar-bonnie-v1.webp" alt="AI 生成的个人酒友形象" data-i18n-alt="alt.generatedAvatar" /><span>AI GENERATED</span></div>
+        <p class="eyebrow" data-i18n="onboarding.eyebrow">Your cyber drinking buddy is ready</p>
+        <h1 id="welcomeTitle" data-i18n-html="onboarding.title">喝了吗？<br />世界正等你举杯。</h1>
+        <p data-i18n="onboarding.copy">AI 为每个人生成一个酒友分身。你只负责举杯，它替你把世界各地的朋友和今晚的故事连起来。</p>
+        <button class="welcome-button" id="enterApp" type="button"><span data-i18n="onboarding.enter">用这个形象进入</span><span>→</span></button>
+        <button class="onboarding-remix" id="remixIntroAvatar" type="button" data-i18n="onboarding.remix">不喜欢？AI 再生成一个</button>
+        <small class="welcome-note" data-i18n="onboarding.note">地图定位只在你主动举杯时使用 · 酒迹记录可关闭</small>
+      </div>
+    </section>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="i18n.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
