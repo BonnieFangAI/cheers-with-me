@@ -6,7 +6,7 @@ require("./i18n.js");
 const translationData = global.window.CheersI18n.translations;
 delete global.window;
 
-const baseUrl = "http://127.0.0.1:8791/?skipIntro=1";
+const baseUrl = process.env.BASE_URL || "http://127.0.0.1:8791/?skipIntro=1";
 
 async function assertNoOverflow(page, label) {
   const dimensions = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth }));
