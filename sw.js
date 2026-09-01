@@ -1,5 +1,5 @@
-const CACHE_NAME = "cheers-with-me-shell-v7";
-const APP_SHELL = ["./", "./index.html", "./styles.css", "./i18n.js", "./app.js", "./manifest.webmanifest", "./assets/ai-avatar-bonnie-v1.webp", "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png"];
+const CACHE_NAME = "cheers-with-me-shell-v8";
+const APP_SHELL = ["./", "./index.html", "./styles.css", "./i18n.js", "./app.js", "./manifest.webmanifest", "./assets/ai-avatar-bonnie-v1.webp", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
