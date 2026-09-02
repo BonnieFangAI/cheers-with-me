@@ -30,6 +30,7 @@ async function assertNoOverflow(page, label) {
   const page = await context.newPage();
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto(baseUrl, { waitUntil: "networkidle" });
+  if (await page.locator("html").getAttribute("lang") !== "zh-CN") throw new Error("Fresh install did not default to Simplified Chinese");
 
   await page.locator(".avatar-button").click();
   const firstAvatar = await page.locator(".avatar-button img").getAttribute("src");
@@ -42,6 +43,7 @@ async function assertNoOverflow(page, label) {
   if (!(await page.locator(".avatar-button img").getAttribute("src"))?.endsWith("ai-avatar-bonnie-v2.webp")) throw new Error("Saved avatar did not persist after reload");
 
   await page.locator("#languageButton").click();
+  if (await page.locator("#languageOptions button:visible").count() !== 4) throw new Error("Not all four language choices are visible");
   await page.locator('[data-language="en"]').click();
   if (await page.locator("html").getAttribute("lang") !== "en") throw new Error("English language did not apply");
   if ((await page.locator("#languageTitle").textContent()).trim() !== "Choose language") throw new Error("English language sheet copy is wrong");
@@ -68,8 +70,23 @@ async function assertNoOverflow(page, label) {
   const autoPage = await autoContext.newPage();
   autoPage.on("pageerror", (error) => errors.push(error.message));
   await autoPage.goto(baseUrl, { waitUntil: "networkidle" });
+  if (await autoPage.locator("html").getAttribute("lang") !== "zh-CN") throw new Error("Default language should remain Chinese on a Swedish device");
+  await autoPage.locator("#languageButton").click();
+  await autoPage.locator('[data-language="auto"]').click();
   if (await autoPage.locator("html").getAttribute("lang") !== "sv") throw new Error("Device-language detection did not select Swedish");
   await assertNoOverflow(autoPage, "Automatic Swedish home");
+
+  const compactContext = await browser.newContext({ viewport: { width: 320, height: 568 }, locale: "en-US" });
+  const compactPage = await compactContext.newPage();
+  compactPage.on("pageerror", (error) => errors.push(error.message));
+  await compactPage.goto(baseUrl, { waitUntil: "networkidle" });
+  await compactPage.locator("#languageButton").click();
+  const languageChoices = await compactPage.locator("#languageOptions button").evaluateAll((buttons) => buttons.map((button) => {
+    const box = button.getBoundingClientRect();
+    return { top: box.top, bottom: box.bottom, inViewport: box.top >= 0 && box.bottom <= innerHeight };
+  }));
+  if (languageChoices.length !== 4 || languageChoices.some((choice) => !choice.inViewport)) throw new Error("All four language choices must fit within a 320x568 viewport");
+  await assertNoOverflow(compactPage, "Compact language sheet");
 
   if (errors.length) throw new Error(`Page errors: ${errors.join(" | ")}`);
   console.log("i18n smoke test passed: zh-CN auto, English, Swedish, persistence, and 390x844 overflow checks");

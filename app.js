@@ -6,7 +6,7 @@
   const HISTORY_KEY = "skal.prototype.history.v1";
   const HISTORY_ENABLED_KEY = "skal.prototype.history-enabled.v1";
   const THEME_KEY = "cheers-with-me.theme.v1";
-  const LANGUAGE_KEY = "cheers-with-me.language.v1";
+  const LANGUAGE_KEY = "cheers-with-me.language.v2";
   const AVATAR_KEY = "cheers-with-me.avatar.v1";
   const AVATARS = [
     "assets/ai-avatar-bonnie-v1.webp",
@@ -49,7 +49,7 @@
     avatarVariant: readAvatarVariant(),
     themeMode: localStorage.getItem(THEME_KEY) || "auto",
     theme: "night",
-    languageMode: localStorage.getItem(LANGUAGE_KEY) || "auto",
+    languageMode: localStorage.getItem(LANGUAGE_KEY) || "zh-CN",
     language: "zh-CN"
   };
 
