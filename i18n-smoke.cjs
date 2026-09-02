@@ -31,6 +31,16 @@ async function assertNoOverflow(page, label) {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto(baseUrl, { waitUntil: "networkidle" });
 
+  await page.locator(".avatar-button").click();
+  const firstAvatar = await page.locator(".avatar-button img").getAttribute("src");
+  await page.locator("#regenerateAvatar").click();
+  await page.waitForFunction((previous) => document.querySelector(".avatar-button img")?.getAttribute("src") !== previous, firstAvatar);
+  const remixedAvatar = await page.locator(".avatar-button img").getAttribute("src");
+  if (!remixedAvatar?.endsWith("ai-avatar-bonnie-v2.webp")) throw new Error(`Avatar remix did not select v2: ${remixedAvatar}`);
+  await page.waitForFunction(() => !document.querySelector("#regenerateAvatar")?.disabled);
+  await page.reload({ waitUntil: "networkidle" });
+  if (!(await page.locator(".avatar-button img").getAttribute("src"))?.endsWith("ai-avatar-bonnie-v2.webp")) throw new Error("Saved avatar did not persist after reload");
+
   await page.locator("#languageButton").click();
   await page.locator('[data-language="en"]').click();
   if (await page.locator("html").getAttribute("lang") !== "en") throw new Error("English language did not apply");

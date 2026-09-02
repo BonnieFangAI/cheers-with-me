@@ -7,6 +7,12 @@
   const HISTORY_ENABLED_KEY = "skal.prototype.history-enabled.v1";
   const THEME_KEY = "cheers-with-me.theme.v1";
   const LANGUAGE_KEY = "cheers-with-me.language.v1";
+  const AVATAR_KEY = "cheers-with-me.avatar.v1";
+  const AVATARS = [
+    "assets/ai-avatar-bonnie-v1.webp",
+    "assets/ai-avatar-bonnie-v2.webp",
+    "assets/ai-avatar-bonnie-v3.webp"
+  ];
   const INVITE_URL = `${location.origin}${location.pathname}?invite=friend`;
   const i18n = window.CheersI18n || { translations: { "zh-CN": {} }, localeNames: { "zh-CN": "简体中文" }, badges: { "zh-CN": "中" } };
 
@@ -40,7 +46,7 @@
     checkin: readCheckin(),
     history: readHistory(),
     historyEnabled: localStorage.getItem(HISTORY_ENABLED_KEY) === "true",
-    avatarVariant: 0,
+    avatarVariant: readAvatarVariant(),
     themeMode: localStorage.getItem(THEME_KEY) || "auto",
     theme: "night",
     languageMode: localStorage.getItem(LANGUAGE_KEY) || "auto",
@@ -130,6 +136,27 @@
     } catch {
       return [];
     }
+  }
+
+  function readAvatarVariant() {
+    const value = Number.parseInt(localStorage.getItem(AVATAR_KEY) || "0", 10);
+    return Number.isInteger(value) && value >= 0 && value < AVATARS.length ? value : 0;
+  }
+
+  function applyAvatarVariant(variant, persist = false) {
+    state.avatarVariant = variant;
+    $$(".avatar-button img, .ai-avatar img, .onboarding-avatar img").forEach((image) => {
+      image.src = AVATARS[variant];
+      image.dataset.variant = String(variant);
+    });
+    if (persist) localStorage.setItem(AVATAR_KEY, String(variant));
+  }
+
+  function preloadAvatars() {
+    AVATARS.forEach((src) => {
+      const image = new Image();
+      image.src = src;
+    });
   }
 
   function saveHistory(checkin) {
@@ -504,20 +531,19 @@
   }
 
   function regenerateAvatar(origin = "profile") {
-    state.avatarVariant = (state.avatarVariant + 1) % 3;
+    const nextVariant = (state.avatarVariant + 1) % AVATARS.length;
     const images = $$(".avatar-button img, .ai-avatar img, .onboarding-avatar img");
     images.forEach((image) => {
       image.classList.add("ai-generating");
-      image.dataset.variant = String(state.avatarVariant);
     });
     const button = origin === "intro" ? $("#remixIntroAvatar") : $("#regenerateAvatar");
-    const original = button.textContent;
     button.disabled = true;
     button.textContent = t("system.avatarGenerating");
+    window.setTimeout(() => applyAvatarVariant(nextVariant, true), 420);
     window.setTimeout(() => {
       images.forEach((image) => image.classList.remove("ai-generating"));
       button.disabled = false;
-      button.textContent = original;
+      button.textContent = t(origin === "intro" ? "onboarding.remix" : "profile.regenerate");
       showToast(t("system.avatarGenerated"));
     }, 1250);
   }
@@ -607,6 +633,8 @@
     if (!["auto", "day", "night"].includes(state.themeMode)) state.themeMode = "auto";
     if (!["auto", "zh-CN", "en", "sv"].includes(state.languageMode)) state.languageMode = "auto";
     state.language = resolveLanguage(state.languageMode);
+    applyAvatarVariant(state.avatarVariant);
+    preloadAvatars();
     applyTheme(state.themeMode === "auto" ? automaticTheme() : state.themeMode);
     applyLanguage(state.languageMode);
     setupInteractions();
